@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliance Analytics - The Moses Method Structures</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background-color: #1e293b; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5); }
+        h1 { color: #38bdf8; margin-bottom: 5px; }
+        h3 { color: #94a3b8; font-weight: 400; margin-top: 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; }
+        .card { background-color: #0f172a; padding: 20px; border-radius: 8px; border-left: 4px solid #38bdf8; text-align: center; }
+        .card.passed { border-left-color: #22c55e; }
+        .card.failed { border-left-color: #ef4444; }
+        .card.violations { border-left-color: #f59e0b; }
+        .card-value { font-size: 2.2rem; font-weight: bold; margin-top: 10px; color: #ffffff; }
+        .card-label { color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .nav-links { margin-top: 25px; display: flex; gap: 15px; }
+        a { color: #38bdf8; text-decoration: none; font-weight: bold; background-color: #0f172a; padding: 10px 16px; border-radius: 6px; border: 1px solid #334155; }
+        a:hover { background-color: #334155; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Compliance Governance Analytics</h1>
+        <h3>The Moses Method Structures, LLC</h3>
+        
+        <div class="grid">
+            <div class="card">
+                <div class="card-label">Total Audits</div>
+                <div class="card-value">{{ total_audits }}</div>
+            </div>
+            <div class="card passed">
+                <div class="card-label">Compliant Log Scans</div>
+                <div class="card-value">{{ passed_audits }}</div>
+            </div>
+            <div class="card failed">
+                <div class="card-label">Compliance Failures</div>
+                <div class="card-value">{{ failed_audits }}</div>
+            </div>
+            <div class="card violations">
+                <div class="card-label">Total Redactions</div>
+                <div class="card-value">{{ total_violations }}</div>
+            </div>
+        </div>
+
+        <div class="card" style="border-left-color: #38bdf8; text-align: left;">
+            <div class="card-label">System Compliance Pass Rate</div>
+            <div class="card-value" style="color: #38bdf8;">{{ pass_rate }}%</div>
+        </div>
+
+        <div class="nav-links">
+            <a href="/">? Back to Portal</a>
+            <a href="/docs">API Docs</a>
+            <a href="/export">Export CSV Report</a>
+        </div>
+    </div>
+</body>
+</html>

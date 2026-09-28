@@ -110,6 +110,34 @@ def home():
 
     return render_template('index.html', result=result, recent_logs=recent_logs)
 
+@app.route('/dashboard')
+def dashboard():
+    conn = sqlite3.connect('audit_logs.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT COUNT(*) FROM audit_logs')
+    total_audits = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM audit_logs WHERE status = 'PASSED'")
+    passed_audits = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM audit_logs WHERE status = 'FAILED COMPLIANCE'")
+    failed_audits = cursor.fetchone()[0]
+    
+    cursor.execute('SELECT SUM(violations_count) FROM audit_logs')
+    total_violations = cursor.fetchone()[0] or 0
+    
+    conn.close()
+    
+    pass_rate = round((passed_audits / total_audits * 100), 1) if total_audits > 0 else 100.0
+
+    return render_template('dashboard.html', 
+                           total_audits=total_audits, 
+                           passed_audits=passed_audits, 
+                           failed_audits=failed_audits, 
+                           total_violations=total_violations, 
+                           pass_rate=pass_rate)
+
 @app.route('/docs')
 def api_docs():
     return render_template('docs.html')
