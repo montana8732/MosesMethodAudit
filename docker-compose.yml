@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: moses_audit_engine
+    ports:
+      - "5000:5000"
+    environment:
+      - SECRET_KEY=MOSES_METHOD_SECRET_KEY_2026
+    volumes:
+      - ./audit_logs.db:/app/audit_logs.db
+    restart: always
