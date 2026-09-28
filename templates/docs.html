@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Compliance Engine</title>
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 30px; }
+        .container { max-width: 900px; margin: 0 auto; background: #1e293b; padding: 35px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        h1 { color: #38bdf8; margin-top: 0; font-size: 26px; }
+        h2 { color: #e2e8f0; font-size: 18px; border-bottom: 1px solid #334155; padding-bottom: 8px; margin-top: 25px; }
+        .nav-link { color: #38bdf8; text-decoration: none; font-size: 14px; font-weight: 600; }
+        .nav-link:hover { text-decoration: underline; }
+        .endpoint-badge { background: #0284c7; color: white; padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 13px; font-family: monospace; }
+        pre { background: #0f172a; padding: 14px; border-radius: 8px; border: 1px solid #334155; font-family: 'Consolas', monospace; color: #38bdf8; font-size: 13px; overflow-x: auto; }
+        code { font-family: 'Consolas', monospace; color: #a7f3d0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border: 1px solid #334155; padding: 10px; text-align: left; }
+        th { background-color: #0f172a; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="nav-link">&larr; Back to Portal Dashboard</a>
+        <h1>REST API Integration Reference</h1>
+        <p style="color: #94a3b8;">The Moses Method Structures, LLC - Healthcare Compliance & Audit Engine</p>
+
+        <h2>Audit Endpoint</h2>
+        <p><span class="endpoint-badge">POST</span> <code>http://localhost:5000/audit</code></p>
+        <p style="color: #cbd5e1;">Sends raw text or log payloads for real-time PHI/PII redaction and database auditing.</p>
+
+        <h2>JSON Request Payload</h2>
+        <pre>{
+  "log_data": "Patient MRN-654321 was evaluated under ICD-10 code E11.9."
+}</pre>
+
+        <h2>JSON Response Structure</h2>
+        <pre>{
+  "agency": "The Moses Method Structures, LLC",
+  "audit_type": "Healthcare AI Bot Log Scan",
+  "compliance_status": "FAILED COMPLIANCE",
+  "total_violations": 2,
+  "violation_details": [
+    "CRITICAL: Potential Medical Record Number (MRN/PHI) detected.",
+    "CRITICAL: Potential ICD-10 Clinical Diagnosis Code (PHI) detected."
+  ],
+  "sanitized_log": "[REDACTED-MRN] was evaluated under [REDACTED-ICD10]."
+}</pre>
+
+        <h2>Integration Examples</h2>
+        
+        <h3>cURL (Terminal)</h3>
+        <pre>curl -X POST http://localhost:5000/audit \
+  -H "Content-Type: application/json" \
+  -d '{"log_data": "Patient MRN-654321 evaluated under ICD-10 code E11.9."}'</pre>
+
+        <h3>Python (`requests`)</h3>
+        <pre>import requests
+
+url = "http://localhost:5000/audit"
+payload = {"log_data": "Patient MRN-654321 evaluated under ICD-10 code E11.9."}
+
+response = requests.post(url, json=payload)
+print(response.json())</pre>
+
+        <h2>Status Codes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>200 OK</code></td>
+                    <td>Scan completed successfully and logged to SQLite.</td>
+                </tr>
+                <tr>
+                    <td><code>400 Bad Request</code></td>
+                    <td>Missing required <code>log_data</code> key in JSON payload.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

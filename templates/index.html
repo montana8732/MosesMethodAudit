@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Compliance Audit Portal</title>
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 30px; }
+        .container { max-width: 1000px; margin: 0 auto; background: #1e293b; padding: 35px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        h1 { color: #38bdf8; margin-top: 0; font-size: 26px; letter-spacing: -0.5px; }
+        h3 { color: #94a3b8; font-weight: 400; margin-top: -10px; font-size: 16px; border-bottom: 1px solid #334155; padding-bottom: 15px; }
+        label { font-weight: 600; color: #e2e8f0; font-size: 15px; }
+        textarea { width: 100%; height: 110px; padding: 14px; border: 1px solid #475569; border-radius: 8px; background: #0f172a; color: #f1f5f9; font-family: 'Consolas', monospace; font-size: 14px; box-sizing: border-box; margin-top: 10px; }
+        textarea:focus { outline: none; border-color: #38bdf8; }
+        .btn-primary { background-color: #0284c7; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; margin-top: 12px; transition: background 0.2s; }
+        .btn-primary:hover { background-color: #0369a1; }
+        .btn-export { background-color: #10b981; text-decoration: none; color: white; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; display: inline-block; }
+        .btn-export:hover { background-color: #059669; }
+        .btn-docs { background-color: #6366f1; text-decoration: none; color: white; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; display: inline-block; }
+        .btn-docs:hover { background-color: #4f46e5; }
+        .btn-danger { background-color: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .btn-danger:hover { background-color: #dc2626; }
+        .result-box { margin-top: 30px; padding: 20px; border-radius: 8px; border-left: 6px solid; }
+        .status-passed { background-color: #064e3b; color: #a7f3d0; border-color: #10b981; }
+        .status-failed { background-color: #450a0a; color: #fecaca; border-color: #ef4444; }
+        .result-box h2 { margin-top: 0; font-size: 20px; }
+        .result-box pre { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; font-family: 'Consolas', monospace; overflow-x: auto; color: #f8fafc; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .badge-passed { background-color: #10b981; color: #022c22; }
+        .badge-failed { background-color: #ef4444; color: #450a0a; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #334155; padding: 12px; text-align: left; }
+        th { background-color: #0f172a; color: #94a3b8; font-weight: 600; }
+        .log-row { cursor: pointer; transition: background 0.15s; }
+        .log-row:hover { background-color: #334155 !important; }
+        tr:nth-child(4n+1) { background-color: #1e293b; }
+        tr:nth-child(4n+3) { background-color: #182234; }
+        .details-row { display: none; background-color: #0f172a !important; }
+        .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px 5px; }
+        .comp-box { background: #1e293b; padding: 12px; border-radius: 6px; border: 1px solid #334155; }
+        .comp-box h5 { margin: 0 0 8px 0; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .comp-box.raw h5 { color: #ef4444; }
+        .comp-box.sanitized h5 { color: #10b981; }
+        .comp-box pre { margin: 0; font-family: 'Consolas', monospace; font-size: 13px; white-space: pre-wrap; word-break: break-word; color: #f1f5f9; }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; }
+        .actions-flex { display: flex; gap: 10px; align-items: center; }
+        code { font-family: 'Consolas', monospace; color: #38bdf8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>The Moses Method Structures, LLC</h1>
+        <h3>Healthcare AI Log Compliance & Governance Audit Engine</h3>
+        
+        <form method="POST">
+            <label for="log_data">Enter Unencrypted Log Data to Audit & Redact:</label><br>
+            <textarea name="log_data" placeholder="Paste raw model outputs, patient notes, or system log payloads..."></textarea><br>
+            <button type="submit" class="btn-primary">Run Compliance Audit</button>
+        </form>
+
+        {% if result %}
+        <div class="result-box {% if result.status == 'PASSED' %}status-passed{% else %}status-failed{% endif %}">
+            <h2>Audit Result: 
+                <span class="badge {% if result.status == 'PASSED' %}badge-passed{% else %}badge-failed{% endif %}">
+                    {{ result.status }}
+                </span>
+            </h2>
+            {% if result.violations %}
+            <h4>Violations Flagged:</h4>
+            <ul>
+                {% for v in result.violations %}
+                <li>{{ v }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <h4>Sanitized Output:</h4>
+            <pre>{{ result.sanitized }}</pre>
+        </div>
+        {% endif %}
+
+        <div class="header-flex">
+            <h3 style="border-bottom: none; padding-bottom: 0; margin: 0; color: #f8fafc;">Recent SQLite Audit Logs <span style="font-size: 12px; color: #94a3b8; font-weight: normal;">(Click row to compare raw vs sanitized)</span></h3>
+            <div class="actions-flex">
+                <a href="/docs" class="btn-docs">API Docs</a>
+                <a href="/export" class="btn-export">Export CSV Report</a>
+                <form action="/clear_logs" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to clear all audit logs?');">
+                    <button type="submit" class="btn-danger">Clear Logs</button>
+                </form>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Status</th>
+                    <th>Violations</th>
+                    <th>Sanitized Preview</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in recent_logs %}
+                <tr class="log-row" onclick="toggleDetails({{ log[0] }})">
+                    <td style="color: #94a3b8;">{{ log[1] }}</td>
+                    <td>
+                        <span class="badge {% if log[2] == 'PASSED' %}badge-passed{% else %}badge-failed{% endif %}">
+                            {{ log[2] }}
+                        </span>
+                    </td>
+                    <td><strong>{{ log[3] }}</strong></td>
+                    <td><code>{{ log[5] }}</code></td>
+                </tr>
+                <tr id="details-{{ log[0] }}" class="details-row">
+                    <td colspan="4">
+                        <div class="comparison-grid">
+                            <div class="comp-box raw">
+                                <h5>Raw Unencrypted Log Entry</h5>
+                                <pre>{{ log[4] }}</pre>
+                            </div>
+                            <div class="comp-box sanitized">
+                                <h5>Sanitized Compliance Output</h5>
+                                <pre>{{ log[5] }}</pre>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #64748b;">No audit logs recorded yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function toggleDetails(id) {
+            const row = document.getElementById('details-' + id);
+            if (row.style.display === 'table-row') {
+                row.style.display = 'none';
+            } else {
+                row.style.display = 'table-row';
+            }
+        }
+    </script>
+</body>
+</html>
