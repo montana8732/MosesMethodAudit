@@ -1,60 +1,228 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compliance Analytics - The Moses Method Structures</title>
+    <title>Compliance Governance Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background-color: #1e293b; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5); }
-        h1 { color: #38bdf8; margin-bottom: 5px; }
-        h3 { color: #94a3b8; font-weight: 400; margin-top: 0; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; }
-        .card { background-color: #0f172a; padding: 20px; border-radius: 8px; border-left: 4px solid #38bdf8; text-align: center; }
-        .card.passed { border-left-color: #22c55e; }
-        .card.failed { border-left-color: #ef4444; }
-        .card.violations { border-left-color: #f59e0b; }
-        .card-value { font-size: 2.2rem; font-weight: bold; margin-top: 10px; color: #ffffff; }
-        .card-label { color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
-        .nav-links { margin-top: 25px; display: flex; gap: 15px; }
-        a { color: #38bdf8; text-decoration: none; font-weight: bold; background-color: #0f172a; padding: 10px 16px; border-radius: 6px; border: 1px solid #334155; }
-        a:hover { background-color: #334155; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+        .header { display: flex; justify-content: space-between; align-items: center; background-color: #003366; color: white; padding: 15px 25px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0; font-size: 24px; }
+        .header-actions { display: flex; gap: 10px; }
+        .header-btn { background-color: #28a745; color: white; padding: 10px 18px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; transition: background-color 0.2s; }
+        .header-btn:hover { background-color: #218838; }
+        .btn-tamper { background-color: #dc3545; }
+        .btn-tamper:hover { background-color: #c82333; }
+        .btn-repair { background-color: #17a2b8; }
+        .btn-repair:hover { background-color: #138496; }
+        
+        .security-banner { padding: 12px 20px; border-radius: 6px; font-weight: bold; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; transition: all 0.3s ease; }
+        .status-checking { background-color: #e2e3e5; color: #383d41; border: 1px solid #d6d8db; }
+        .status-verified { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-breach { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; animation: pulse 1.5s infinite; }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+
+        .cards-container { display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; }
+        .card { background: white; padding: 20px; border-radius: 8px; flex: 1; min-width: 200px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; }
+        .card h3 { margin: 0 0 10px 0; color: #666; font-size: 14px; text-transform: uppercase; }
+        .card .value { font-size: 28px; font-weight: bold; color: #003366; }
+        .charts-container { display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; }
+        .chart-box { background: white; padding: 20px; border-radius: 8px; flex: 1; min-width: 300px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .chart-box h2 { font-size: 16px; margin-top: 0; color: #003366; }
+        .audit-form-container { background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .audit-form-container h2 { margin-top: 0; color: #003366; font-size: 18px; }
+        textarea { width: 100%; height: 80px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; margin-bottom: 10px; }
+        .btn-submit { background-color: #003366; color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-submit:hover { background-color: #002244; }
+        .table-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .table-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .table-container h2 { margin: 0; color: #003366; font-size: 18px; }
+        .search-input { padding: 8px 14px; border: 1px solid #ccc; border-radius: 4px; width: 300px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; word-break: break-all; }
+        th { background-color: #f8f9fa; color: #003366; font-weight: bold; }
+        tr:hover { background-color: #f1f1f1; }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <div class="header">
         <h1>Compliance Governance Analytics</h1>
-        <h3>The Moses Method Structures, LLC</h3>
-        
-        <div class="grid">
-            <div class="card">
-                <div class="card-label">Total Audits</div>
-                <div class="card-value">{{ total_audits }}</div>
-            </div>
-            <div class="card passed">
-                <div class="card-label">Compliant Log Scans</div>
-                <div class="card-value">{{ passed_audits }}</div>
-            </div>
-            <div class="card failed">
-                <div class="card-label">Compliance Failures</div>
-                <div class="card-value">{{ failed_audits }}</div>
-            </div>
-            <div class="card violations">
-                <div class="card-label">Total Redactions</div>
-                <div class="card-value">{{ total_violations }}</div>
-            </div>
-        </div>
-
-        <div class="card" style="border-left-color: #38bdf8; text-align: left;">
-            <div class="card-label">System Compliance Pass Rate</div>
-            <div class="card-value" style="color: #38bdf8;">{{ pass_rate }}%</div>
-        </div>
-
-        <div class="nav-links">
-            <a href="/">? Back to Portal</a>
-            <a href="/docs">API Docs</a>
-            <a href="/export">Export CSV Report</a>
+        <div class="header-actions">
+            <button onclick="triggerTamper()" class="header-btn btn-tamper">🧪 Simulate Data Breach</button>
+            <button onclick="triggerRepair()" class="header-btn btn-repair">🔧 Repair Ledger</button>
+            <a href="/api/audit/export-csv" class="header-btn">📥 Export CSV Audit Report</a>
         </div>
     </div>
+
+    <!-- Live Security Status Banner -->
+    <div id="securityBanner" class="security-banner status-checking">
+        <span id="securityText">🛡️ Performing Cryptographic Ledger Integrity Check...</span>
+        <small id="securityTimestamp"></small>
+    </div>
+
+    <div class="cards-container">
+        <div class="card">
+            <h3>Total Audits</h3>
+            <div class="value">{{ total_audits }}</div>
+        </div>
+        <div class="card">
+            <h3>Compliant Scans</h3>
+            <div class="value" style="color: #28a745;">{{ compliant_scans }}</div>
+        </div>
+        <div class="card">
+            <h3>Compliance Failures</h3>
+            <div class="value" style="color: #dc3545;">{{ compliance_failures }}</div>
+        </div>
+        <div class="card">
+            <h3>Total Redactions</h3>
+            <div class="value" style="color: #fd7e14;">{{ total_redactions }}</div>
+        </div>
+        <div class="card">
+            <h3>Pass Rate</h3>
+            <div class="value">{{ pass_rate }}%</div>
+        </div>
+    </div>
+
+    <div class="charts-container">
+        <div class="chart-box" style="max-width: 350px;">
+            <h2>System Compliance Breakdown</h2>
+            <canvas id="complianceChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h2>Violations by Category</h2>
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+
+    <div class="audit-form-container">
+        <h2>Run Live Compliance Audit</h2>
+        <form action="/audit" method="POST">
+            <textarea name="log_data" placeholder="Paste un-sanitized log string here to run real-time PHI/PII redactions..." required></textarea>
+            <button type="submit" class="btn-submit">Run Audit & Update Ledger</button>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header-row">
+            <h2>Recent Audit Trail Register</h2>
+            <input type="text" id="auditSearch" class="search-input" placeholder="🔍 Search audit logs live..." onkeyup="filterAuditTable()">
+        </div>
+        <table id="auditTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Timestamp (UTC)</th>
+                    <th>Actor ID</th>
+                    <th>Action</th>
+                    <th>Sanitized Payload</th>
+                    <th>Record SHA-256 Hash</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log[0] }}</td>
+                    <td>{{ log[1] }}</td>
+                    <td>{{ log[2] }}</td>
+                    <td><strong>{{ log[3] }}</strong></td>
+                    <td>{{ log[4] }}</td>
+                    <td><small>{{ log[5] }}</small></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function checkIntegrity() {
+            const banner = document.getElementById('securityBanner');
+            const text = document.getElementById('securityText');
+            const timestamp = document.getElementById('securityTimestamp');
+            
+            try {
+                const response = await fetch('/api/audit/verify');
+                const data = await response.json();
+                
+                timestamp.innerText = "Verified at: " + new Date().toLocaleTimeString();
+                
+                if (data.status === "VERIFIED") {
+                    banner.className = "security-banner status-verified";
+                    text.innerText = "✅ SYSTEM INTEGRITY: VERIFIED — Cryptographic ledger hash chain is intact.";
+                } else {
+                    banner.className = "security-banner status-breach";
+                    text.innerText = "🚨 CRITICAL ALERT: " + data.message;
+                }
+            } catch (err) {
+                banner.className = "security-banner status-breach";
+                text.innerText = "⚠️ ERROR: Unable to reach verification endpoint.";
+            }
+        }
+
+        async function triggerTamper() {
+            if (confirm("Simulate an unauthorized database tamper attempt on Record ID 1?")) {
+                await fetch('/api/audit/tamper', { method: 'POST' });
+                checkIntegrity();
+            }
+        }
+
+        async function triggerRepair() {
+            if (confirm("Re-sign and seal all ledger records to restore cryptographic integrity?")) {
+                await fetch('/api/audit/repair', { method: 'POST' });
+                window.location.reload();
+            }
+        }
+
+        function filterAuditTable() {
+            const input = document.getElementById('auditSearch');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('auditTable');
+            const trs = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < trs.length; i++) {
+                const rowText = trs[i].innerText.toLowerCase();
+                if (rowText.includes(filter)) {
+                    trs[i].style.display = '';
+                } else {
+                    trs[i].style.display = 'none';
+                }
+            }
+        }
+
+        checkIntegrity();
+
+        const ctxCompliance = document.getElementById('complianceChart').getContext('2d');
+        new Chart(ctxCompliance, {
+            type: 'doughnut',
+            data: {
+                labels: ['Compliant', 'Non-Compliant'],
+                datasets: [{
+                    data: [{{ chart_data.compliant }}, {{ chart_data.failures }}],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+        new Chart(ctxCategory, {
+            type: 'bar',
+            data: {
+                labels: {{ chart_data.categories | tojson }},
+                datasets: [{
+                    label: 'Redactions Triggered',
+                    data: {{ chart_data.category_values | tojson }},
+                    backgroundColor: '#003366'
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    </script>
 </body>
 </html>
