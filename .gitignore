@@ -3,3 +3,8 @@ __pycache__/
 *.db
 *.csv
 .venv/
+venv/
+__pycache__/
+*.db
+.DS_Store
+.vscode/

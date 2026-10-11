@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿# Enterprise Compliance & Cryptographic Audit Ledger Engine
 
 Developed by **The Moses Method Structures, LLC**
@@ -15,3 +16,6 @@ A high-throughput local compliance governance and log-auditing engine built with
 * **Backend:** Python 3, Flask, SQLite3, Hashlib, Regex
 * **Frontend:** HTML5, CSS3, JavaScript (ES6+), Chart.js
 * **DevOps & Scripting:** PowerShell Automation
+=======
+# MosesMethodAudit
+>>>>>>> 628733c4f3509d9e01ab5e5482488a1046d821d4
